@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>portfolio.ipynb — M. Hanif Mulyazam</title>
+<meta name="description" content="Portfolio interaktif M. Hanif Mulyazam, Data Scientist — bergaya Jupyter Notebook.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#fbfaf8;
+    --paper:#ffffff;
+    --ink:#1f2328;
+    --ink-soft:#5b6169;
+    --rule:#e4e2dd;
+    --code-bg:#f6f5f2;
+    --jupy-orange:#f37626;
+    --prompt-blue:#3a6ea5;
+    --prompt-purple:#7a5cb0;
+    --green-dot:#3fb950;
+    --chip-bg:#eef0ec;
+    --chip-ink:#3a3f36;
+    --link:#2a5db0;
+    --mono: 'JetBrains Mono', ui-monospace, monospace;
+    --sans: 'IBM Plex Sans', -apple-system, sans-serif;
+  }
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--sans);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{ color:var(--link); text-decoration:none; }
+  a:hover{ text-decoration:underline; }
+  .notebook{
+    max-width:860px;
+    margin:0 auto;
+    padding:0 20px 80px;
+  }
+
+  /* ---- fake jupyter chrome ---- */
+  .topbar{
+    background:var(--paper);
+    border-bottom:1px solid var(--rule);
+    padding:14px 20px;
+    position:sticky;
+    top:0;
+    z-index:20;
+  }
+  .topbar-inner{
+    max-width:860px;
+    margin:0 auto;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    flex-wrap:wrap;
+  }
+  .topbar-title{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-family:var(--mono);
+    font-size:13.5px;
+    color:var(--ink-soft);
+  }
+  .jlogo{
+    width:20px; height:20px;
+    border-radius:5px;
+    background:var(--jupy-orange);
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    color:#fff;
+    font-family:var(--mono);
+    font-size:11px;
+    font-weight:700;
+  }
+  .menu-row{
+    display:flex;
+    gap:14px;
+    font-family:var(--mono);
+    font-size:12px;
+    color:#9a9d99;
+    margin-top:6px;
+  }
+  .kernel-status{
+    display:flex; align-items:center; gap:6px;
+    font-family:var(--mono); font-size:12px; color:var(--ink-soft);
+  }
+  .dot{
+    width:8px; height:8px; border-radius:50%;
+    background:var(--green-dot);
+    box-shadow:0 0 0 3px rgba(63,185,80,0.15);
+  }
+
+  /* ---- cells ---- */
+  .cell{ display:flex; gap:14px; margin:26px 0; align-items:flex-start; }
+  .prompt{
+    font-family:var(--mono);
+    font-size:12.5px;
+    color:var(--prompt-blue);
+    white-space:nowrap;
+    padding-top:12px;
+    width:64px;
+    flex-shrink:0;
+    text-align:right;
+  }
+  .prompt.out{ color:var(--prompt-purple); }
+  .cell-body{ flex:1; min-width:0; }
+
+  .code{
+    background:var(--code-bg);
+    border:1px solid var(--rule);
+    border-radius:6px;
+    padding:14px 16px;
+    font-family:var(--mono);
+    font-size:13px;
+    overflow-x:auto;
+    color:#3b3f36;
+  }
+  .code .kw{ color:#a55b0e; }
+  .code .fn{ color:#3a6ea5; }
+  .code .str{ color:#4c7a3d; }
+  .code .cm{ color:#9a9d99; font-style:italic; }
+
+  .md h1{
+    font-family:var(--sans);
+    font-size:34px;
+    font-weight:700;
+    margin:4px 0 6px;
+    letter-spacing:-0.01em;
+  }
+  .md h2{
+    font-family:var(--sans);
+    font-size:22px;
+    font-weight:700;
+    margin:0 0 6px;
+  }
+  .md p{ margin:0 0 10px; color:var(--ink); font-size:15.5px; }
+  .md .lede{ color:var(--ink-soft); font-size:15.5px; }
+  .tagline{
+    font-family:var(--mono); font-size:14px; color:var(--jupy-orange);
+    margin-bottom:14px;
+  }
+  .tagline .cursor{ display:inline-block; width:7px; height:16px; background:var(--jupy-orange); vertical-align:-2px; animation:blink 1.1s step-end infinite; }
+  @keyframes blink{ 50%{ opacity:0; } }
+
+  .avatar{
+    width:104px; height:104px; border-radius:14px;
+    background:linear-gradient(150deg,#f4ede2,#e7e2da);
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--mono); font-weight:700; font-size:34px; color:#9c8a6d;
+    margin-bottom:16px;
+    border:1px solid var(--rule);
+  }
+
+  .meta-row{
+    display:flex; flex-wrap:wrap; gap:6px 18px;
+    font-size:13.5px; color:var(--ink-soft);
+    margin:10px 0 16px;
+  }
+  .btn-row{ display:flex; flex-wrap:wrap; gap:10px; margin-top:6px; }
+  .btn{
+    font-family:var(--mono); font-size:13px;
+    padding:8px 14px; border-radius:6px;
+    border:1px solid var(--rule);
+    background:var(--paper);
+    color:var(--ink);
+  }
+  .btn:hover{ border-color:#c9c6bf; text-decoration:none; background:#f4f3f0; }
+  .btn.primary{ background:var(--ink); color:#fff; border-color:var(--ink); }
+  .btn.primary:hover{ background:#000; }
+
+  /* skills */
+  .skill-groups{ display:grid; grid-template-columns:repeat(auto-fit, minmax(210px,1fr)); gap:16px; margin-top:8px; }
+  .skill-group-label{ font-family:var(--mono); font-size:12px; color:var(--ink-soft); margin-bottom:6px; }
+  .chip-wrap{ display:flex; flex-wrap:wrap; gap:6px; }
+  .chip{
+    background:var(--chip-bg); color:var(--chip-ink);
+    font-size:12.5px; padding:4px 10px; border-radius:5px;
+    font-family:var(--mono);
+    border:1px solid #e0ded7;
+  }
+
+  /* timeline */
+  .tl-item{
+    border-left:2px solid var(--rule);
+    padding:2px 0 18px 18px;
+    position:relative;
+    margin-left:4px;
+  }
+  .tl-item::before{
+    content:''; position:absolute; left:-6px; top:6px;
+    width:10px; height:10px; border-radius:50%;
+    background:var(--paper); border:2px solid var(--jupy-orange);
+  }
+  .tl-item:last-child{ border-left-color:transparent; }
+  .tl-role{ font-weight:700; font-size:15.5px; }
+  .tl-org{ font-size:14.5px; color:var(--ink-soft); }
+  .tl-date{ font-family:var(--mono); font-size:12px; color:var(--ink-soft); margin:2px 0 8px; }
+  .tl-item ul{ margin:0; padding-left:18px; }
+  .tl-item li{ font-size:14.5px; margin-bottom:5px; color:#3a3f36; }
+
+  /* projects */
+  .project-card{
+    border:1px solid var(--rule);
+    border-radius:8px;
+    background:var(--paper);
+    margin-bottom:20px;
+    overflow:hidden;
+  }
+  .project-viz{
+    background:#14161a;
+    padding:20px;
+    color:#e7e6e3;
+    font-family:var(--mono);
+    font-size:12px;
+  }
+  .project-body{ padding:16px 18px 18px; }
+  .project-title{ font-weight:700; font-size:16.5px; margin-bottom:6px; }
+  .project-desc{ font-size:14.5px; color:#3a3f36; margin-bottom:12px; }
+  .stat-row{ display:flex; flex-wrap:wrap; gap:10px; margin-bottom:12px; }
+  .stat{
+    font-family:var(--mono); font-size:12px;
+    background:var(--code-bg); border:1px solid var(--rule);
+    border-radius:5px; padding:5px 10px; color:#3a3f36;
+  }
+
+  .svg-wrap{ display:flex; justify-content:center; }
+  .svg-wrap svg{ max-width:100%; height:auto; }
+
+  .misc-list{ list-style:none; padding:0; margin:0; }
+  .misc-list li{
+    font-size:14.5px; padding:9px 0; border-bottom:1px solid var(--rule);
+  }
+  .misc-list li:last-child{ border-bottom:none; }
+  .misc-tag{
+    font-family:var(--mono); font-size:11px; color:#fff;
+    background:#8a8f86; padding:2px 7px; border-radius:4px; margin-right:8px;
+  }
+
+  .award{ margin-bottom:10px; font-size:14.5px; }
+  .award strong{ display:block; font-size:15px; }
+  .award span{ color:var(--ink-soft); font-size:13.5px; }
+
+  .edu-gpa{
+    display:inline-flex; align-items:baseline; gap:6px;
+    font-family:var(--mono); background:var(--code-bg);
+    border:1px solid var(--rule); border-radius:6px; padding:6px 12px; margin-top:8px;
+  }
+  .edu-gpa b{ font-size:20px; }
+  .edu-gpa span{ font-size:12px; color:var(--ink-soft); }
+
+  .contact-grid{ display:flex; flex-wrap:wrap; gap:22px; margin:10px 0 16px; font-size:14.5px; }
+  footer{
+    text-align:center; font-family:var(--mono); font-size:12px;
+    color:var(--ink-soft); margin-top:50px; padding-top:20px; border-top:1px solid var(--rule);
+  }
+
+  @media (max-width:600px){
+    .cell{ flex-direction:column; gap:4px; }
+    .prompt{ text-align:left; padding-top:0; width:auto; }
+    .md h1{ font-size:27px; }
+    .avatar{ width:84px; height:84px; font-size:26px; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .cursor{ animation:none; }
+    html{ scroll-behavior:auto; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div>
+      <div class="topbar-title">
+        <span class="jlogo">J</span>
+        portfolio.ipynb — Last Checkpoint: baru saja
+      </div>
+      <div class="menu-row">
+        <span>File</span><span>Edit</span><span>View</span><span>Insert</span><span>Cell</span><span>Kernel</span><span>Help</span>
+      </div>
+    </div>
+    <div class="kernel-status"><span class="dot"></span> Python 3 (ipykernel) · Idle</div>
+  </div>
+</div>
+
+<div class="notebook">
+
+  <!-- HERO -->
+  <div class="cell">
+    <div class="prompt">In&nbsp;[1]:</div>
+    <div class="cell-body">
+      <div class="md">
+        <div class="avatar">HM</div>
+        <h1>M. Hanif Mulyazam</h1>
+        <div class="tagline">Data Scientist — Machine Learning · NLP · Computer Vision<span class="cursor"></span></div>
+        <p class="lede">
+          Data Science graduate (Telkom University, GPA 3.08/4.00), saat ini menjalani internship sebagai
+          <strong>Data Engineer</strong> di <strong>PT. Entropi Global Martech</strong>. Berpengalaman membangun
+          pipeline data end-to-end, model machine learning, serta pekerjaan NLP dan computer vision — dari
+          orkestrasi Airflow, caching Redis, hingga deployment berbasis Docker/AWS.
+        </p>
+        <div class="meta-row">
+          <span>📍 Tangerang Selatan, Banten, Indonesia</span>
+          <span>✉️ hanifmulyazam27@gmail.com</span>
+        </div>
+        <div class="btn-row">
+          <a class="btn" href="mailto:hanifmulyazam27@gmail.com">Email</a>
+          <a class="btn" href="https://github.com/hanifmulyazam-hub" target="_blank" rel="noopener">GitHub</a>
+          <a class="btn" href="https://linkedin.com/in/hanifmulyazam" target="_blank" rel="noopener">LinkedIn</a>
+          <a class="btn primary" href="CV_M_Hanif_Mulyazam_ATS.pdf" target="_blank" rel="noopener">Download CV (PDF)</a>
+          <a class="btn" href="mailto:hanifmulyazam27@gmail.com?subject=Let%27s%20collaborate">Hubungi Saya</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROFILE OBJECT -->
+  <div class="cell">
+    <div class="prompt">In&nbsp;[2]:</div>
+    <div class="cell-body">
+      <div class="code"><span class="kw">from</span> profile <span class="kw">import</span> DataScientist
+
+hanif = DataScientist(
+    nama=<span class="str">"M. Hanif Mulyazam"</span>,
+    kampus=<span class="str">"Telkom University"</span>,
+    peran_sekarang=<span class="str">"Data Engineer Intern @ PT. Entropi Global Martech"</span>,
+    fokus=[<span class="str">"Data Engineering"</span>, <span class="str">"Machine Learning"</span>, <span class="str">"NLP"</span>, <span class="str">"Computer Vision"</span>],
+    status=<span class="str">"Fresh graduate, aktif magang"</span>
+)
+<span class="fn">print</span>(hanif.ringkasan())</div>
+    </div>
+  </div>
+  <div class="cell">
+    <div class="prompt out">Out[2]:</div>
+    <div class="cell-body">
+      <div class="md">
+        <p>
+          Data Scientist dengan latar belakang <strong>Data Science</strong> dari Telkom University, dan pengalaman
+          langsung di data engineering, machine learning, NLP, serta computer vision. Sedang menjalani internship
+          sebagai <strong>Data Engineer</strong> di <strong>PT. Entropi Global Martech</strong> — membangun pipeline
+          Airflow, caching Redis, dan deployment berbasis Docker/AWS — setelah sebelumnya menjadi <strong>Data
+          Analyst Intern</strong> di PT Pos Indonesia. Aktif juga dalam kepemimpinan organisasi sebagai bagian dari
+          Telkom University Choir. Terbiasa mengubah data mentah menjadi sistem dan insight yang siap dipakai
+          untuk pengambilan keputusan.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SKILLS -->
+  <div class="cell">
+    <div class="prompt">In&nbsp;[3]:</div>
+    <div class="cell-body">
+      <div class="code">skills = {
+    <span class="str">"Data Engineering"</span>: [<span class="str">"Apache Airflow"</span>, <span class="str">"ETL/ELT"</span>, <span class="str">"Redis"</span>, <span class="str">"REST API"</span>],
+    <span class="str">"Bahasa & Database"</span>: [<span class="str">"Python"</span>, <span class="str">"SQL"</span>, <span class="str">"MySQL"</span>, <span class="str">"PostgreSQL"</span>],
+    <span class="str">"Cloud & DevOps"</span>: [<span class="str">"AWS"</span>, <span class="str">"GCP"</span>, <span class="str">"Docker"</span>],
+    <span class="str">"Machine Learning"</span>: [<span class="str">"Scikit-learn"</span>, <span class="str">"XGBoost"</span>, <span class="str">"Model Evaluation"</span>, <span class="str">"ARIMA"</span>],
+    <span class="str">"Computer Vision"</span>: [<span class="str">"YOLOv8"</span>, <span class="str">"OpenCV"</span>, <span class="str">"ByteTrack"</span>],
+    <span class="str">"NLP & GenAI"</span>: [<span class="str">"TF-IDF"</span>, <span class="str">"SGDClassifier"</span>, <span class="str">"OpenAI API"</span>],
+    <span class="str">"BI & Visualization"</span>: [<span class="str">"Power BI"</span>, <span class="str">"Tableau"</span>, <span class="str">"Streamlit"</span>, <span class="str">"Matplotlib"</span>],
+    <span class="str">"Tools"</span>: [<span class="str">"Git"</span>, <span class="str">"Docker"</span>],
+}
+render_skills(skills)</div>
+    </div>
+  </div>
+  <div class="cell">
+    <div class="prompt out">Out[3]:</div>
+    <div class="cell-body">
+      <div class="skill-groups">
+        <div>
+          <div class="skill-group-label">Data Engineering</div>
+          <div class="chip-wrap"><span class="chip">Apache Airflow</span><span class="chip">ETL/ELT</span><span class="chip">Redis</span><span class="chip">REST API</span></div>
+        </div>
+        <div>
+          <div class="skill-group-label">Bahasa & Database</div>
+          <div class="chip-wrap"><span class="chip">Python</span><span class="chip">SQL</span><span class="chip">MySQL</span><span class="chip">PostgreSQL</span></div>
+        </div>
+        <div>
+          <div class="skill-group-label">Cloud & DevOps</div>
+          <div class="chip-wrap"><span class="chip">AWS</span><span class="chip">GCP</span><span class="chip">Docker</span></div>
+        </div>
+        <div>
+          <div class="skill-group-label">Machine Learning</div>
+          <div class="chip-wrap"><span class="chip">Scikit-learn</span><span class="chip">XGBoost</span><span class="chip">Model Evaluation</span><span class="chip">ARIMA</span></div>
+        </div>
+        <div>
+          <div class="skill-group-label">Computer Vision</div>
+          <div class="chip-wrap"><span class="chip">YOLOv8</span><span class="chip">OpenCV</span><span class="chip">ByteTrack</span></div>
+        </div>
+        <div>
+          <div class="skill-group-label">NLP & GenAI</div>
+          <div class="chip-wrap"><span class="chip">TF-IDF</span><span class="chip">SGDClassifier</span><span class="chip">OpenAI API</span></div>
+        </div>
+        <div>
+          <div class="skill-group-label">BI & Visualization</div>
+          <div class="chip-wrap"><span class="chip">Power BI</span><span class="chip">Tableau</span><span class="chip">Streamlit</span><span class="chip">Matplotlib</span></div>
+        </div>
+        <div>
+          <div class="skill-group-label">Tools</div>
+          <div class="chip-wrap"><span class="chip">Git</span><span class="chip">Docker</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXPERIENCE TIMELINE -->
+  <div class="cell">
+    <div class="prompt">In&nbsp;[4]:</div>
+    <div class="cell-body">
+      <div class="code"><span class="cm"># riwayat pengalaman, diurutkan dari yang terbaru</span>
+pengalaman.sort(key=<span class="kw">lambda</span> x: x[<span class="str">"mulai"</span>], reverse=<span class="kw">True</span>)
+tampilkan_timeline(pengalaman)</div>
+    </div>
+  </div>
+  <div class="cell">
+    <div class="prompt out">Out[4]:</div>
+    <div class="cell-body">
+      <div class="tl-item">
+        <div class="tl-role">Data Engineer Intern</div>
+        <div class="tl-org">PT. Entropi Global Martech</div>
+        <div class="tl-date">Aug 2026 – Present</div>
+        <ul>
+          <li>Merancang dan membangun pipeline data end-to-end menggunakan Apache Airflow untuk orkestrasi, penjadwalan, dan manajemen dependensi lintas workflow ETL.</li>
+          <li>Mengimplementasikan Redis untuk caching dan staging data agar latensi pipeline berkurang dan mendukung pemrosesan near real-time.</li>
+          <li>Mengembangkan dan memelihara skema database PostgreSQL, termasuk optimasi query dan pengecekan integritas data di setiap tahap pipeline.</li>
+          <li>Men-deploy dan mengelola layanan pipeline di AWS, serta melakukan containerization dengan Docker untuk deployment yang konsisten dan portabel.</li>
+          <li>Mengintegrasikan REST API untuk menghubungkan output pipeline dengan aplikasi dan tools internal.</li>
+          <li>Mengotomasi proses ETL/ELT rutin, mengurangi intervensi manual dan meningkatkan reliabilitas pipeline.</li>
+          <li>Memantau kesehatan pipeline dan mengimplementasikan logic recovery/retry untuk memastikan pengiriman data yang konsisten dan production-ready.</li>
+        </ul>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-role">Data Analyst Intern</div>
+        <div class="tl-org">Talent Development / ITMS Nova — PT Pos Indonesia (Persero)</div>
+        <div class="tl-date">Jun 2025 – Sep 2025</div>
+        <ul>
+          <li>Melakukan data cleaning, validasi, eksplorasi, dan reporting untuk dataset HR/talent development.</li>
+          <li>Menyiapkan data siap-dashboard dan merangkum insight survei untuk kebutuhan talent development.</li>
+          <li>Melakukan QA/alpha testing modul ITMS Nova: pembuatan event, filter, pagination, download Excel, hingga cek kelengkapan career plan.</li>
+          <li>Mendokumentasikan temuan dan berkolaborasi dengan pengguna untuk meningkatkan kualitas data & keandalan sistem sebelum rilis.</li>
+        </ul>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-role">Head of Coaching Division / General Affair</div>
+        <div class="tl-org">Telkom University Choir</div>
+        <div class="tl-date">Okt 2023 – Jan 2025</div>
+        <ul>
+          <li>Mengoordinasikan kegiatan coaching, dukungan latihan, pengembangan anggota, dan logistik acara untuk kompetisi nasional & internasional.</li>
+          <li>Mengelola inventaris dan pencatatan peralatan untuk mendukung operasional yang efisien.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROJECTS INTRO -->
+  <div class="cell">
+    <div class="prompt">In&nbsp;[5]:</div>
+    <div class="cell-body">
+      <div class="md">
+        <h2>Projects</h2>
+        <p>Kumpulan eksperimen dan proyek data science — mulai dari machine learning klinis, computer vision lalu lintas, NLP, sampai time series forecasting.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROJECT 1 -->
+  <div class="cell">
+    <div class="prompt">In&nbsp;[6]:</div>
+    <div class="cell-body">
+      <div class="code">base_models = [<span class="str">"RandomForest"</span>, <span class="str">"XGBoost"</span>, <span class="str">"SVM"</span>, <span class="str">"MLP"</span>]
+model = StackingClassifier(
+    estimators=base_models,
+    final_estimator=LogisticRegression()  <span class="cm"># meta-learner</span>
+)
+model.fit(X_train_scaled, y_train)  <span class="cm"># StandardScaler + IQR cleaning</span>
+evaluate(model, cv=5, metric=<span class="str">"roc_auc"</span>)</div>
+    </div>
+  </div>
+  <div class="cell">
+    <div class="prompt out">Out[6]:</div>
+    <div class="cell-body">
+      <div class="project-card">
+        <div class="project-viz">
+          <div class="svg-wrap">
+            <svg viewBox="0 0 260 170" width="260" height="170">
+              <line x1="30" y1="10" x2="30" y2="140" stroke="#3a3f36" stroke-width="1"/>
+              <line x1="30" y1="140" x2="240" y2="140" stroke="#3a3f36" stroke-width="1"/>
+              <line x1="30" y1="140" x2="230" y2="15" stroke="#5b6169" stroke-width="1" stroke-dasharray="3,3"/>
+              <path d="M30,140 C 70,40 120,15 230,12" fill="none" stroke="#f37626" stroke-width="2.5"/>
+              <text x="8" y="12" fill="#9a9d99" font-size="9" font-family="JetBrains Mono">1.0</text>
+              <text x="14" y="144" fill="#9a9d99" font-size="9" font-family="JetBrains Mono">0.0</text>
+              <text x="215" y="152" fill="#9a9d99" font-size="9" font-family="JetBrains Mono">1.0</text>
+              <text x="70" y="160" fill="#9a9d99" font-size="9" font-family="JetBrains Mono">False Positive Rate</text>
+              <text x="90" y="25" fill="#e7e6e3" font-size="10" font-family="JetBrains Mono">ROC Curve · AUC = 0.91</text>
+            </svg>
+          </div>
+        </div>
+        <div class="project-body">
+          <div class="project-title">Cardiovascular Risk Classification & Streamlit Prototype</div>
+          <div class="project-desc">
+            Membangun stacking classifier dengan base model Random Forest, XGBoost, SVM, dan MLP, serta meta-learner
+            Logistic Regression di atas data profil klinis — lengkap dengan pembersihan IQR/logical, StandardScaler,
+            validasi stratified 5-fold, dan optimasi threshold. Metrik dievaluasi lewat Accuracy, Precision, Recall,
+            F1-score, dan ROC AUC, lalu didemokan lewat prototipe Streamlit untuk local risk screening.
+          </div>
+          <div class="chip-wrap" style="margin-bottom:12px;">
+            <span class="chip">Python</span><span class="chip">Scikit-learn</span><span class="chip">XGBoost</span><span class="chip">SVM</span><span class="chip">MLP</span><span class="chip">SHAP</span><span class="chip">Streamlit</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat">ROC AUC 0.91</span><span class="stat">Stratified 5-Fold CV</span><span class="stat">4 base model + meta-learner</span>
+          </div>
+          <a href="https://github.com/hanifmulyazam-hub" target="_blank" rel="noopener">Repo GitHub →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROJECT 2 -->
+  <div class="cell">
+    <div class="prompt">In&nbsp;[7]:</div>
+    <div class="cell-body">
+      <div class="code">model = YOLO(<span class="str">"yolov8n.pt"</span>)
+tracker = ByteTrack()
+<span class="kw">for</span> frame <span class="kw">in</span> cctv_stream(<span class="str">"buah_batu.mp4"</span>):
+    detections = model.predict(frame)
+    tracks = tracker.update(detections)
+    count_by_roi_and_direction(tracks)  <span class="cm"># -> CSV log</span></div>
+    </div>
+  </div>
+  <div class="cell">
+    <div class="prompt out">Out[7]:</div>
+    <div class="cell-body">
+      <div class="project-card">
+        <div class="project-viz">
+          <div class="svg-wrap">
+            <svg viewBox="0 0 260 150" width="260" height="150">
+              <rect x="20" y="30" width="60" height="34" fill="none" stroke="#4c9ee8" stroke-width="1.5"/>
+              <text x="20" y="26" fill="#4c9ee8" font-size="9" font-family="JetBrains Mono">car 0.94</text>
+              <rect x="120" y="70" width="70" height="40" fill="none" stroke="#e8a44c" stroke-width="1.5"/>
+              <text x="120" y="66" fill="#e8a44c" font-size="9" font-family="JetBrains Mono">truck 0.88</text>
+              <rect x="190" y="20" width="50" height="30" fill="none" stroke="#4c9ee8" stroke-width="1.5"/>
+              <text x="190" y="16" fill="#4c9ee8" font-size="9" font-family="JetBrains Mono">car 0.97</text>
+              <text x="20" y="135" fill="#e7e6e3" font-size="10" font-family="JetBrains Mono">42 kendaraan/menit</text>
+            </svg>
+          </div>
+        </div>
+        <div class="project-body">
+          <div class="project-title">Vehicle Detection, Tracking & Counting — Buah Batu Traffic</div>
+          <div class="project-desc">
+            Pipeline computer vision berbasis CCTV untuk deteksi kendaraan dan multi-object tracking, mencakup ROI
+            counting, pelacakan arah gerak, visual HUD, dan pencatatan event lalu lintas ke CSV.
+          </div>
+          <div class="chip-wrap" style="margin-bottom:12px;">
+            <span class="chip">YOLOv8</span><span class="chip">ByteTrack</span><span class="chip">OpenCV</span><span class="chip">Roboflow Supervision</span><span class="chip">Python</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat">~42 kendaraan/menit real-time</span><span class="stat">Confidence hingga 0.97</span><span class="stat">Multi-ROI directional counting</span>
+          </div>
+          <a href="https://github.com/hanifmulyazam-hub" target="_blank" rel="noopener">Repo GitHub →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROJECT 3 -->
+  <div class="cell">
+    <div class="prompt">In&nbsp;[8]:</div>
+    <div class="cell-body">
+      <div class="code">X = TfidfVectorizer().fit_transform(corpus)
+clf = SGDClassifier(loss=<span class="str">"log_loss"</span>).fit(X, y_intent)
+detect_out_of_scope(clf, threshold=0.62)</div>
+    </div>
+  </div>
+  <div class="cell">
+    <div class="prompt out">Out[8]:</div>
+    <div class="cell-body">
+      <div class="project-card">
+        <div class="project-viz">
+          <div class="svg-wrap">
+            <svg viewBox="0 0 260 150" width="260" height="150">
+              <rect x="60" y="20" width="60" height="30" fill="#2f6d3d" opacity="0.85"/>
+              <text x="80" y="39" fill="#fff" font-size="11" font-family="JetBrains Mono">132</text>
+              <rect x="120" y="20" width="60" height="30" fill="#7a3d3d" opacity="0.7"/>
+              <text x="140" y="39" fill="#fff" font-size="11" font-family="JetBrains Mono">6</text>
+              <rect x="60" y="50" width="60" height="30" fill="#7a3d3d" opacity="0.7"/>
+              <text x="80" y="69" fill="#fff" font-size="11" font-family="JetBrains Mono">4</text>
+              <rect x="120" y="50" width="60" height="30" fill="#2f6d3d" opacity="0.85"/>
+              <text x="140" y="69" fill="#fff" font-size="11" font-family="JetBrains Mono">118</text>
+              <rect x="90" y="80" width="60" height="30" fill="#2f6d3d" opacity="0.85"/>
+              <text x="110" y="99" fill="#fff" font-size="11" font-family="JetBrains Mono">53</text>
+              <text x="60" y="110" fill="#e7e6e3" font-size="9" font-family="JetBrains Mono">order · status · oos</text>
+              <text x="60" y="15" fill="#e7e6e3" font-size="10" font-family="JetBrains Mono">Confusion Matrix</text>
+            </svg>
+          </div>
+        </div>
+        <div class="project-body">
+          <div class="project-title">NLP Intent Classification & Out-of-Scope Detection</div>
+          <div class="project-desc">
+            Workflow klasifikasi intent lengkap: text preprocessing, feature extraction, perbandingan model, laporan
+            validasi/testing, error analysis, hingga penanganan out-of-scope berbasis threshold.
+          </div>
+          <div class="chip-wrap" style="margin-bottom:12px;">
+            <span class="chip">Python</span><span class="chip">TF-IDF</span><span class="chip">Scikit-learn</span><span class="chip">SGDClassifier</span><span class="chip">Model Evaluation</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat">~94% akurasi klasifikasi</span><span class="stat">3 kelas intent + OOS</span><span class="stat">Threshold OOS 0.62</span>
+          </div>
+          <a href="https://github.com/hanifmulyazam-hub" target="_blank" rel="noopener">Repo GitHub →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROJECT 4 -->
+  <div class="cell">
+    <div class="prompt">In&nbsp;[9]:</div>
+    <div class="cell-body">
+      <div class="code">df = pd.read_csv(<span class="str">"production_power.csv"</span>)
+risk = flag_high_risk(df, cols=[<span class="str">"load"</span>, <span class="str">"efficiency"</span>])
+build_dashboard_concept(df, risk)</div>
+    </div>
+  </div>
+  <div class="cell">
+    <div class="prompt out">Out[9]:</div>
+    <div class="cell-body">
+      <div class="project-card">
+        <div class="project-viz">
+          <div class="svg-wrap">
+            <svg viewBox="0 0 260 150" width="260" height="150">
+              <rect x="30" y="90" width="16" height="30" fill="#4c9ee8"/>
+              <rect x="55" y="70" width="16" height="50" fill="#4c9ee8"/>
+              <rect x="80" y="40" width="16" height="80" fill="#e05c5c"/>
+              <rect x="105" y="60" width="16" height="60" fill="#4c9ee8"/>
+              <rect x="130" y="30" width="16" height="90" fill="#e05c5c"/>
+              <polyline points="38,100 63,85 88,60 113,75 138,45" fill="none" stroke="#f2c94c" stroke-width="2"/>
+              <text x="80" y="20" fill="#e05c5c" font-size="9" font-family="JetBrains Mono">zona risiko tinggi</text>
+              <text x="20" y="140" fill="#e7e6e3" font-size="9" font-family="JetBrains Mono">load (bar) · efficiency (line)</text>
+            </svg>
+          </div>
+        </div>
+        <div class="project-body">
+          <div class="project-title">Production Efficiency & Power Risk Analytics</div>
+          <div class="project-desc">
+            Menganalisis data operasional produksi dan power untuk mengidentifikasi kondisi high-risk dan
+            high-efficiency, mengubah metrik jadi insight, serta merancang konsep dashboard untuk pengambilan keputusan.
+          </div>
+          <div class="chip-wrap" style="margin-bottom:12px;">
+            <span class="chip">Python</span><span class="chip">Pandas</span><span class="chip">Visualization</span><span class="chip">Dashboard Concept</span>
+          </div>
+          <a href="https://github.com/hanifmulyazam-hub" target="_blank" rel="noopener">Repo GitHub →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROJECT 5 -->
+  <div class="cell">
+    <div class="prompt">In&nbsp;[10]:</div>
+    <div class="cell-body">
+      <div class="code">series = adf_test(tsla_close)  <span class="cm"># stationarity check</span>
+model = ARIMA(series, order=(2,1,2)).fit()
+forecast = model.forecast(steps=30)
+rmse(y_true, forecast)</div>
+    </div>
+  </div>
+  <div class="cell">
+    <div class="prompt out">Out[10]:</div>
+    <div class="cell-body">
+      <div class="project-card">
+        <div class="project-viz">
+          <div class="svg-wrap">
+            <svg viewBox="0 0 260 150" width="260" height="150">
+              <polyline points="20,90 50,70 80,85 110,60 140,75" fill="none" stroke="#4c9ee8" stroke-width="2"/>
+              <polyline points="140,75 170,65 200,80 230,55" fill="none" stroke="#f37626" stroke-width="2" stroke-dasharray="4,3"/>
+              <line x1="140" y1="10" x2="140" y2="130" stroke="#5b6169" stroke-width="1" stroke-dasharray="2,2"/>
+              <text x="115" y="8" fill="#9a9d99" font-size="9" font-family="JetBrains Mono">today</text>
+              <text x="20" y="142" fill="#e7e6e3" font-size="9" font-family="JetBrains Mono">actual (solid) · forecast (dashed) · RMSE 4.82</text>
+              <text x="60" y="20" fill="#e7e6e3" font-size="10" font-family="JetBrains Mono">TSLA · ARIMA(2,1,2) Forecast</text>
+            </svg>
+          </div>
+        </div>
+        <div class="project-body">
+          <div class="project-title">Tesla Stock Time Series Forecasting</div>
+          <div class="project-desc">
+            Menerapkan metodologi Box-Jenkins secara lengkap: transformasi, uji stasioneritas, analisis ACF/PACF,
+            pemodelan ARIMA, forecasting, dan evaluasi berbasis RMSE.
+          </div>
+          <div class="chip-wrap" style="margin-bottom:12px;">
+            <span class="chip">Python</span><span class="chip">ARIMA</span><span class="chip">ADF Test</span><span class="chip">ACF/PACF</span><span class="chip">RMSE</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat">RMSE 4.82</span><span class="stat">Forecast horizon 30 hari</span>
+          </div>
+          <a href="https://github.com/hanifmulyazam-hub" target="_blank" rel="noopener">Repo GitHub →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROJECT 6 -->
+  <div class="cell">
+    <div class="prompt">In&nbsp;[11]:</div>
+    <div class="cell-body">
+      <div class="code">df = pd.read_csv(<span class="str">"student_performance.csv"</span>)
+sns.heatmap(df.corr(), annot=<span class="kw">True</span>)
+summarize_insights(df)</div>
+    </div>
+  </div>
+  <div class="cell">
+    <div class="prompt out">Out[11]:</div>
+    <div class="cell-body">
+      <div class="project-card">
+        <div class="project-viz">
+          <div class="svg-wrap">
+            <svg viewBox="0 0 260 150" width="260" height="150">
+              <rect x="40" y="20" width="40" height="40" fill="#2f6d3d"/>
+              <rect x="80" y="20" width="40" height="40" fill="#e8a44c" opacity="0.8"/>
+              <rect x="120" y="20" width="40" height="40" fill="#4c9ee8" opacity="0.6"/>
+              <rect x="40" y="60" width="40" height="40" fill="#e8a44c" opacity="0.8"/>
+              <rect x="80" y="60" width="40" height="40" fill="#2f6d3d"/>
+              <rect x="120" y="60" width="40" height="40" fill="#4c9ee8" opacity="0.4"/>
+              <rect x="40" y="100" width="40" height="40" fill="#4c9ee8" opacity="0.6"/>
+              <rect x="80" y="100" width="40" height="40" fill="#4c9ee8" opacity="0.4"/>
+              <rect x="120" y="100" width="40" height="40" fill="#2f6d3d"/>
+              <text x="20" y="15" fill="#e7e6e3" font-size="9" font-family="JetBrains Mono">Correlation Matrix</text>
+              <text x="42" y="150" fill="#9a9d99" font-size="8" font-family="JetBrains Mono">nilai · hadir · tugas</text>
+            </svg>
+          </div>
+        </div>
+        <div class="project-body">
+          <div class="project-title">Student Performance Exploratory Data Analysis</div>
+          <div class="project-desc">
+            Melakukan EDA untuk mengeksplorasi faktor-faktor performa akademik, memvisualisasikan tren, menganalisis
+            korelasi, dan menghasilkan insight untuk keputusan pendidikan berbasis data.
+          </div>
+          <div class="chip-wrap">
+            <span class="chip">Python</span><span class="chip">Pandas</span><span class="chip">Matplotlib</span><span class="chip">Google Colab</span>
+          </div>
+          <a href="https://github.com/hanifmulyazam-hub" target="_blank" rel="noopener" style="display:inline-block; margin-top:10px;">Repo GitHub →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MISC PROJECTS -->
+  <div class="cell">
+    <div class="prompt">In&nbsp;[12]:</div>
+    <div class="cell-body">
+      <div class="code">other_projects = load_more(<span class="str">"portfolio/misc"</span>)
+list_projects(other_projects)</div>
+    </div>
+  </div>
+  <div class="cell">
+    <div class="prompt out">Out[12]:</div>
+    <div class="cell-body">
+      <ul class="misc-list">
+        <li><span class="misc-tag">Figma</span><strong>Gojek Mobile App Redesign</strong> — konsep redesign dengan fitur keamanan & trip-planning: pilih pengemudi wanita, prediksi cuaca, dan prediksi lalu lintas.</li>
+        <li><span class="misc-tag">Viz</span><strong>Multi-Topic Data Visualization & Infographics</strong> — infografis data-driven tentang climate change, kampanye Napoleon, dan polusi udara.</li>
+        <li><span class="misc-tag">Plan</span><strong>Academic Performance Prediction System — PM Plan</strong> — rencana manajemen proyek: penjadwalan, dokumentasi, dan aset komunikasi visual.</li>
+        <li><span class="misc-tag">C++</span><strong>Web-Based Library Application</strong> — sistem perpustakaan lokal dengan peminjaman buku, inventaris, dan koneksi database MySQL.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- AWARDS -->
+  <div class="cell">
+    <div class="prompt">In&nbsp;[13]:</div>
+    <div class="cell-body">
+      <div class="code">awards.sort(key=<span class="kw">lambda</span> a: a[<span class="str">"tahun"</span>], reverse=<span class="kw">True</span>)
+show_medals(awards)  <span class="cm"># choir competitions</span></div>
+    </div>
+  </div>
+  <div class="cell">
+    <div class="prompt out">Out[13]:</div>
+    <div class="cell-body">
+      <div class="award">
+        <strong>1st Place — Mixed Choir Category</strong>
+        <span>6th PENABUR International Choir Festival, Jakarta (2024)</span>
+      </div>
+      <div class="award">
+        <strong>1st Place — Polyphony Category</strong>
+        <span>70th Habanera and Polyphony International Choral Competition, Torrevieja, Spain (2024)</span>
+      </div>
+      <div class="award">
+        <strong>2nd Place — Habanera Category</strong>
+        <span>70th Habanera and Polyphony International Choral Competition, Torrevieja, Spain (2024)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- EDUCATION -->
+  <div class="cell">
+    <div class="prompt">In&nbsp;[14]:</div>
+    <div class="cell-body">
+      <div class="code"><span class="fn">print</span>(pendidikan.describe())</div>
+    </div>
+  </div>
+  <div class="cell">
+    <div class="prompt out">Out[14]:</div>
+    <div class="cell-body">
+      <div class="md">
+        <p><strong>Bachelor of Data Science</strong><br>
+        Telkom University, Faculty of Informatics — Bandung, Indonesia</p>
+        <p>Bahasa: Indonesia (Native) · English (Professional Working Proficiency)</p>
+        <div class="edu-gpa"><b>3.08</b><span>GPA / 4.00</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTACT -->
+  <div class="cell">
+    <div class="prompt">In&nbsp;[15]:</div>
+    <div class="cell-body">
+      <div class="code"><span class="kw">if</span> __name__ == <span class="str">"__main__"</span>:
+    hubungi(hanif, subject=<span class="str">"Let's collaborate"</span>)</div>
+    </div>
+  </div>
+  <div class="cell">
+    <div class="prompt out">Out[15]:</div>
+    <div class="cell-body">
+      <div class="contact-grid">
+        <span>✉️ <a href="mailto:hanifmulyazam27@gmail.com">hanifmulyazam27@gmail.com</a></span>
+        <span>📞 +62 812-2093-6801</span>
+        <span>📍 Tangerang Selatan, Banten, Indonesia</span>
+      </div>
+      <div class="btn-row">
+        <a class="btn primary" href="mailto:hanifmulyazam27@gmail.com?subject=Let%27s%20collaborate">Kirim Email</a>
+        <a class="btn" href="CV_M_Hanif_Mulyazam_ATS.pdf" target="_blank" rel="noopener">Download CV</a>
+        <a class="btn" href="https://github.com/hanifmulyazam-hub" target="_blank" rel="noopener">Lihat GitHub</a>
+        <a class="btn" href="https://linkedin.com/in/hanifmulyazam" target="_blank" rel="noopener">Lihat LinkedIn</a>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    © 2026 Dibuat oleh M. Hanif Mulyazam · Kernel: Idle · siap untuk berkolaborasi.
+  </footer>
+
+</div>
+</body>
+</html>
